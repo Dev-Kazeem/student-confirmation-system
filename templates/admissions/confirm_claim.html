@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Confirm Claim — {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-check2-circle me-1"></i> Confirm Claim
+                </div>
+                <div class="card-body p-4">
+                    <p class="mb-3">
+                        Please confirm that this record belongs to you. Once claimed,
+                        it cannot be transferred.
+                    </p>
+
+                    <dl class="row small mb-4">
+                        <dt class="col-sm-4">Name</dt>
+                        <dd class="col-sm-8">{{ record.student_name }}</dd>
+
+                        <dt class="col-sm-4">JAMB number</dt>
+                        <dd class="col-sm-8">{{ record.jamb_number }}</dd>
+
+                        {% if record.admission_number %}
+                            <dt class="col-sm-4">Admission number</dt>
+                            <dd class="col-sm-8">{{ record.admission_number }}</dd>
+                        {% endif %}
+
+                        <dt class="col-sm-4">Department</dt>
+                        <dd class="col-sm-8">{{ record.department.name }}</dd>
+
+                        <dt class="col-sm-4">Programme</dt>
+                        <dd class="col-sm-8">{{ record.programme.name }}</dd>
+
+                        <dt class="col-sm-4">Session</dt>
+                        <dd class="col-sm-8">{{ record.session.name }}</dd>
+                    </dl>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'admissions:check_admission' %}"
+                               class="btn btn-outline-secondary flex-fill">
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary flex-fill">
+                                <i class="bi bi-check2-circle me-1"></i> Yes, claim this record
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

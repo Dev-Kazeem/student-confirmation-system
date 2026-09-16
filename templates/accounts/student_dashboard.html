@@ -14,36 +14,81 @@
         </a>
     </div>
 
-    <div class="alert alert-info small">
-        <i class="bi bi-info-circle me-1"></i>
-        Your dashboard will be populated in later phases (profile, admission check, application, documents).
+    {# --- Step 1: claim admission --------------------------------------------- #}
+    {% if not profile.admission_record %}
+        <div class="card border-0 shadow-sm mb-3 border-start border-warning border-4">
+            <div class="card-body">
+                <h6 class="fw-bold mb-1">
+                    <i class="bi bi-1-circle-fill text-warning me-1"></i> Check and claim your admission
+                </h6>
+                <p class="small text-muted mb-3">
+                    Enter your JAMB or admission number to find your admission record and claim it.
+                </p>
+                <a href="{% url 'admissions:check_admission' %}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-search me-1"></i> Check admission
+                </a>
+            </div>
+        </div>
+    {% else %}
+        <div class="card border-0 shadow-sm mb-3 border-start border-success border-4">
+            <div class="card-body">
+                <h6 class="fw-bold mb-1">
+                    <i class="bi bi-check-circle-fill text-success me-1"></i> Admission claimed
+                </h6>
+                <p class="small text-muted mb-0">
+                    {{ profile.admission_record.programme.name }} —
+                    {{ profile.admission_record.session.name }}
+                </p>
+            </div>
+        </div>
+    {% endif %}
+
+    {# --- Step 2: complete profile -------------------------------------------- #}
+    {% if not profile.is_complete %}
+        <div class="card border-0 shadow-sm mb-3 border-start border-warning border-4">
+            <div class="card-body">
+                <h6 class="fw-bold mb-1">
+                    <i class="bi bi-2-circle-fill text-warning me-1"></i> Complete your profile
+                </h6>
+                <p class="small text-muted mb-3">
+                    Some fields are still missing. Complete them before proceeding.
+                </p>
+                <a href="{% url 'accounts:student_profile_edit' %}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-pencil me-1"></i> Complete profile
+                </a>
+            </div>
+        </div>
+    {% else %}
+        <div class="card border-0 shadow-sm mb-3 border-start border-success border-4">
+            <div class="card-body">
+                <h6 class="fw-bold mb-1">
+                    <i class="bi bi-check-circle-fill text-success me-1"></i> Profile complete
+                </h6>
+            </div>
+        </div>
+    {% endif %}
+
+    {# --- Step 3: application (Phase 5) --------------------------------------- #}
+    <div class="card border-0 shadow-sm mb-3 border-start border-secondary border-4">
+        <div class="card-body">
+            <h6 class="fw-bold mb-1">
+                <i class="bi bi-3-circle text-secondary me-1"></i> Submit your confirmation application
+            </h6>
+            <p class="small text-muted mb-0">
+                Available in Phase Five.
+            </p>
+        </div>
     </div>
 
-    <div class="row g-3">
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <h6 class="fw-bold"><i class="bi bi-person-vcard me-1 text-primary"></i> Profile</h6>
-                    <p class="small text-muted mb-0">Complete your personal information.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <h6 class="fw-bold"><i class="bi bi-file-earmark-text me-1 text-primary"></i> Application</h6>
-                    <p class="small text-muted mb-0">Fill and submit your confirmation application.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <h6 class="fw-bold"><i class="bi bi-bell me-1 text-primary"></i> Notifications</h6>
-                    <p class="small text-muted mb-0">View updates about your application.</p>
-                </div>
-            </div>
-        </div>
+    <div class="mt-4">
+        <a href="{% url 'accounts:student_profile' %}" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-person-vcard me-1"></i> View full profile
+        </a>
+        {% if profile.admission_record %}
+            <a href="{% url 'admissions:my_admission' %}" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-file-earmark-person me-1"></i> View my admission
+            </a>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

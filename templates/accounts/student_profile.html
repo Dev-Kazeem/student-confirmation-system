@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile — {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h4 fw-bold mb-1">My Profile</h1>
+            <p class="text-muted small mb-0">Personal and academic information.</p>
+        </div>
+        <a href="{% url 'accounts:student_profile_edit' %}" class="btn btn-primary btn-sm">
+            <i class="bi bi-pencil me-1"></i> Edit profile
+        </a>
+    </div>
+
+    {% if not profile.is_complete %}
+        <div class="alert alert-warning small">
+            <i class="bi bi-exclamation-triangle me-1"></i>
+            Your profile is incomplete. Please fill the remaining fields.
+            {% if profile.missing_fields %}
+                <div class="mt-1">
+                    Missing:
+                    <ul class="mb-0">
+                        {% for f in profile.missing_fields %}
+                            <li>{{ f|title }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="alert alert-success small">
+            <i class="bi bi-check-circle me-1"></i> Your profile is complete.
+        </div>
+    {% endif %}
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center">
+                <div class="card-body">
+                    {% if profile.profile_picture %}
+                        <img src="{{ profile.profile_picture.url }}" alt="Profile"
+                             class="rounded-circle mb-3" width="120" height="120"
+                             style="object-fit: cover;">
+                    {% else %}
+                        <div class="rounded-circle bg-secondary text-white d-inline-flex align-items-center justify-content-center mb-3"
+                             style="width: 120px; height: 120px; font-size: 3rem;">
+                            <i class="bi bi-person"></i>
+                        </div>
+                    {% endif %}
+                    <h5 class="fw-bold mb-0">{{ profile.full_name|default:user.username }}</h5>
+                    <p class="text-muted small mb-0">{{ user.email }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0 fw-semibold">Personal Information</h6>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0 small">
+                        <dt class="col-sm-4">Full name</dt>
+                        <dd class="col-sm-8">{{ profile.full_name|default:"—" }}</dd>
+
+                        <dt class="col-sm-4">Phone number</dt>
+                        <dd class="col-sm-8">{{ profile.phone_number|default:"—" }}</dd>
+
+                        <dt class="col-sm-4">Date of birth</dt>
+                        <dd class="col-sm-8">{{ profile.date_of_birth|date:"M j, Y"|default:"—" }}</dd>
+
+                        <dt class="col-sm-4">Gender</dt>
+                        <dd class="col-sm-8">{{ profile.get_gender_display|default:"—" }}</dd>
+
+                        <dt class="col-sm-4">State of origin</dt>
+                        <dd class="col-sm-8">{{ profile.state_of_origin|default:"—" }}</dd>
+
+                        <dt class="col-sm-4">LGA</dt>
+                        <dd class="col-sm-8">{{ profile.lga|default:"—" }}</dd>
+
+                        <dt class="col-sm-4">Residential address</dt>
+                        <dd class="col-sm-8">{{ profile.residential_address|default:"—" }}</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mt-3">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0 fw-semibold">Academic Information</h6>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0 small">
+                        <dt class="col-sm-4">JAMB number</dt>
+                        <dd class="col-sm-8">{{ profile.jamb_number|default:"—" }}</dd>
+
+                        <dt class="col-sm-4">Admission number</dt>
+                        <dd class="col-sm-8">{{ profile.admission_number|default:"—" }}</dd>
+
+                        <dt class="col-sm-4">Department</dt>
+                        <dd class="col-sm-8">{{ profile.admission_record.department.name|default:"—" }}</dd>
+
+                        <dt class="col-sm-4">Programme</dt>
+                        <dd class="col-sm-8">{{ profile.admission_record.programme.name|default:"—" }}</dd>
+
+                        <dt class="col-sm-4">Session</dt>
+                        <dd class="col-sm-8">{{ profile.admission_record.session.name|default:"—" }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

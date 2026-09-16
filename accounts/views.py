@@ -10,7 +10,7 @@ from django.contrib.auth.views import (
     PasswordResetDoneView,
     PasswordResetView,
 )
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 
 from .forms import (
@@ -18,9 +18,16 @@ from .forms import (
     PortalPasswordChangeForm,
     PortalPasswordResetForm,
     PortalSetPasswordForm,
+    StudentProfileForm,
     StudentRegistrationForm,
 )
 from .models import User
+
+from auditlogs.models import AuditLog
+from auditlogs.utils import get_client_ip
+
+from .decorators import student_required
+from .forms import StudentProfileForm
 
 
 # ---------------------------------------------------------------------------
@@ -102,7 +109,13 @@ def student_dashboard(request):
     if not request.user.is_student and not request.user.is_superuser:
         messages.warning(request, "You are not authorized to view the student dashboard.")
         return redirect("accounts:redirect_after_login")
-    return render(request, "accounts/student_dashboard.html")
+    profile = request.user.student_profile
+    profile.refresh_completion()
+    return render(
+        request,
+        "accounts/student_dashboard.html",
+        {"profile": profile},
+    )
 
 
 @login_required
@@ -159,3 +172,54 @@ class PortalPasswordChangeView(PasswordChangeView):
 @login_required
 def password_change_done(request):
     return render(request, "accounts/password_change_done.html")
+
+
+
+
+
+# ---------------------------------------------------------------------------
+# Student profile
+# ---------------------------------------------------------------------------
+@student_required
+def student_profile(request):
+    """Display the student's profile."""
+    profile = request.user.student_profile
+    profile.refresh_completion()
+    return render(
+        request,
+        "accounts/student_profile.html",
+        {"profile": profile},
+    )
+
+
+@student_required
+def student_profile_edit(request):
+    """Edit the student's profile."""
+    profile = request.user.student_profile
+
+    if request.method == "POST":
+        form = StudentProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            profile = form.save(commit=False)
+            profile.refresh_completion(save=False)
+            profile.save()
+
+            AuditLog.record(
+                user=request.user,
+                action=AuditLog.Action.PROFILE_UPDATE,
+                description="Updated student profile.",
+                target=profile,
+                ip_address=get_client_ip(request),
+                user_agent=request.META.get("HTTP_USER_AGENT", ""),
+            )
+            messages.success(request, "Profile updated successfully.")
+            return redirect("accounts:student_profile")
+        messages.error(request, "Please correct the errors below.")
+    else:
+        form = StudentProfileForm(instance=profile)
+
+    return render(
+        request,
+        "accounts/student_profile_edit.html",
+        {"form": form, "profile": profile},
+    )    

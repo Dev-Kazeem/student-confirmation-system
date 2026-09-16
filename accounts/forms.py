@@ -9,7 +9,7 @@ from django.contrib.auth.forms import (
 from django.core.exceptions import ValidationError
 
 from .models import User
-
+from .models import StudentProfile, User
 
 class StudentRegistrationForm(UserCreationForm):
     """
@@ -120,3 +120,56 @@ class PortalPasswordChangeForm(PasswordChangeForm):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs["class"] = "form-control"
+
+
+class StudentProfileForm(forms.ModelForm):
+    """
+    Editable personal information for a student.
+
+    Some fields (JAMB, admission number, full_name when claimed) are read-only
+    once the student has claimed an admission record.
+    """
+
+    
+    class Meta:
+        model = StudentProfile
+        fields = (
+            "full_name",
+            "phone_number",
+            "date_of_birth",
+            "gender",
+            "state_of_origin",
+            "lga",
+            "residential_address",
+            "profile_picture",
+        )
+        widgets = {
+            "full_name": forms.TextInput(attrs={"class": "form-control"}),
+            "phone_number": forms.TextInput(attrs={"class": "form-control"}),
+            "date_of_birth": forms.DateInput(
+                attrs={"class": "form-control", "type": "date"}
+            ),
+            "gender": forms.Select(attrs={"class": "form-select"}),
+            "state_of_origin": forms.TextInput(attrs={"class": "form-control"}),
+            "lga": forms.TextInput(attrs={"class": "form-control"}),
+            "residential_address": forms.Textarea(
+                attrs={"class": "form-control", "rows": 3}
+            ),
+            "profile_picture": forms.ClearableFileInput(
+                attrs={"class": "form-control", "accept": "image/*"}
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name, field in self.fields.items():
+            field.required = name != "profile_picture"
+
+    def clean_profile_picture(self):
+        pic = self.cleaned_data.get("profile_picture")
+        if pic and hasattr(pic, "content_type"):
+            if not pic.content_type.startswith("image/"):
+                raise forms.ValidationError("Please upload an image file.")
+            if pic.size > 2 * 1024 * 1024:
+                raise forms.ValidationError("Profile picture must be 2 MB or smaller.")
+        return pic

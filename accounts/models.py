@@ -72,7 +72,7 @@ class StudentProfile(models.Model):
     Personal and academic information submitted by a student.
 
     One-to-one with User. Created automatically when a student registers
-    (Phase Three) or when an admission record is claimed.
+    (via signal in accounts/signals.py) or when an admission record is claimed.
     """
 
     class Gender(models.TextChoices):
@@ -106,6 +106,17 @@ class StudentProfile(models.Model):
     )
     admission_number = models.CharField(max_length=30, blank=True, db_index=True)
 
+    # --- admission record (set when student claims it) -----------------------
+    admission_record = models.OneToOneField(
+        "admissions.AdmissionRecord",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="student_profile",
+        help_text="The admission record this student claimed.",
+    )
+    claimed_at = models.DateTimeField(null=True, blank=True)
+
     # --- meta ----------------------------------------------------------------
     profile_picture = models.ImageField(
         upload_to="profile_pictures/", null=True, blank=True
@@ -124,6 +135,37 @@ class StudentProfile(models.Model):
             models.Index(fields=["jamb_number"]),
             models.Index(fields=["admission_number"]),
         ]
+
+    # --- helpers -------------------------------------------------------------
+    # Fields a student must fill before submitting an application (Phase Five).
+    REQUIRED_FIELDS = (
+        "full_name",
+        "phone_number",
+        "date_of_birth",
+        "gender",
+        "state_of_origin",
+        "lga",
+        "residential_address",
+    )
+
+    def missing_fields(self) -> list[str]:
+        """Return the list of required fields that are still empty."""
+        missing = []
+        for name in self.REQUIRED_FIELDS:
+            value = getattr(self, name)
+            if value in (None, "", []):
+                missing.append(name)
+        if not self.admission_record_id:
+            missing.append("admission_record")
+        return missing
+
+    def refresh_completion(self, save: bool = True) -> bool:
+        """Update is_complete based on missing_fields()."""
+        complete = not self.missing_fields()
+        if save and complete != self.is_complete:
+            self.is_complete = complete
+            self.save(update_fields=["is_complete", "updated_at"])
+        return complete
 
     def __str__(self) -> str:
         return f"Profile — {self.user.get_full_name() or self.user.username}"

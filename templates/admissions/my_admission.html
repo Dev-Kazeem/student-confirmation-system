@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}My Admission — {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="h4 fw-bold mb-4">My Admission Information</h1>
+
+    {% if not record %}
+        <div class="alert alert-warning">
+            You have not yet claimed an admission record.
+            <a href="{% url 'admissions:check_admission' %}" class="alert-link">Check your admission</a>.
+        </div>
+    {% else %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-file-earmark-person me-1"></i> Admission Details
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0 small">
+                    <dt class="col-sm-4">Name</dt>
+                    <dd class="col-sm-8">{{ record.student_name }}</dd>
+
+                    <dt class="col-sm-4">JAMB number</dt>
+                    <dd class="col-sm-8">{{ record.jamb_number }}</dd>
+
+                    {% if record.admission_number %}
+                        <dt class="col-sm-4">Admission number</dt>
+                        <dd class="col-sm-8">{{ record.admission_number }}</dd>
+                    {% endif %}
+
+                    <dt class="col-sm-4">Department</dt>
+                    <dd class="col-sm-8">{{ record.department.name }}</dd>
+
+                    <dt class="col-sm-4">Programme</dt>
+                    <dd class="col-sm-8">{{ record.programme.name }}</dd>
+
+                    <dt class="col-sm-4">Session</dt>
+                    <dd class="col-sm-8">{{ record.session.name }}</dd>
+
+                    <dt class="col-sm-4">Status</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge bg-success">{{ record.get_status_display }}</span>
+                    </dd>
+
+                    {% if profile.claimed_at %}
+                        <dt class="col-sm-4">Claimed on</dt>
+                        <dd class="col-sm-8">{{ profile.claimed_at|date:"M j, Y H:i" }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <a href="{% url 'accounts:student_profile' %}" class="btn btn-primary">
+                <i class="bi bi-person-vcard me-1"></i> Go to profile
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

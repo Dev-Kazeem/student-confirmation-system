@@ -16,6 +16,10 @@ urlpatterns = [
     path("officer/", views.officer_dashboard, name="officer_dashboard"),
     path("admin/", views.admin_dashboard, name="admin_dashboard"),
 
+    # Student profile
+    path("student/profile/", views.student_profile, name="student_profile"),
+    path("student/profile/edit/", views.student_profile_edit, name="student_profile_edit"),
+
     # Password reset (anonymous)
     path("password-reset/", views.PortalPasswordResetView.as_view(), name="password_reset"),
     path("password-reset/done/", views.PortalPasswordResetDoneView.as_view(), name="password_reset_done"),
