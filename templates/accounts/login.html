@@ -1,0 +1,39 @@
+{% extends "accounts/_auth_base.html" %}
+
+{% block title %}Log In — {{ SITE_NAME }}{% endblock %}
+{% block auth_title %}Welcome Back{% endblock %}
+{% block auth_subtitle %}Log in to continue your confirmation.{% endblock %}
+
+{% block auth_content %}
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger small">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <div class="mb-3">
+        <label for="{{ form.username.id_for_label }}" class="form-label small fw-semibold">Username</label>
+        {{ form.username }}
+        {% for err in form.username.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+    </div>
+
+    <div class="mb-2">
+        <label for="{{ form.password.id_for_label }}" class="form-label small fw-semibold">Password</label>
+        {{ form.password }}
+        {% for err in form.password.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+    </div>
+
+    <div class="text-end mb-3">
+        <a href="{% url 'accounts:password_reset' %}" class="small">Forgot your password?</a>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">
+        <i class="bi bi-box-arrow-in-right me-1"></i> Log in
+    </button>
+
+    <p class="text-center small mt-3 mb-0">
+        Don't have an account? <a href="{% url 'accounts:register' %}">Register</a>
+    </p>
+</form>
+{% endblock %}

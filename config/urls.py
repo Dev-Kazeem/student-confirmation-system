@@ -21,13 +21,12 @@ from django.urls import include, path
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("accounts/", include(("accounts.urls", "accounts"), namespace="accounts")),
     path("", include(("core.urls", "core"), namespace="core")),
 ]
 
-# Serve media in development (production uses Cloudinary).
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-# Custom error pages
 handler404 = "core.views.error_404"
 handler500 = "core.views.error_500"

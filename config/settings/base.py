@@ -113,8 +113,8 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-LOGIN_URL = "accounts:login"          # defined in Phase Three
-LOGIN_REDIRECT_URL = "core:home"
+LOGIN_URL = "accounts:login"
+LOGIN_REDIRECT_URL = "accounts:redirect_after_login"
 LOGOUT_REDIRECT_URL = "core:home"
 
 # -------------------------------------------------------------------
