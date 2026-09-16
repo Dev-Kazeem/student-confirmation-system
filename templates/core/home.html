@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Home — {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<section class="hero-section text-white py-5">
+    <div class="container py-5">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <h1 class="display-5 fw-bold mb-3">
+                    Student Confirmation &amp; Document Verification Portal
+                </h1>
+                <p class="lead mb-4">
+                    Complete your admission confirmation online, upload required
+                    documents, track your application status, and download a
+                    verifiable digital confirmation slip.
+                </p>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="#" class="btn btn-light btn-lg text-primary fw-semibold">
+                        <i class="bi bi-person-plus me-1"></i> Get Started
+                    </a>
+                    <a href="#" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-shield-check me-1"></i> Verify a Slip
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-block text-center">
+                <i class="bi bi-patch-check-fill" style="font-size: 12rem; opacity: .35;"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">How It Works</h2>
+            <p class="text-muted">Four simple steps to complete your confirmation.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-person-plus-fill text-primary fs-1"></i>
+                        <h5 class="card-title mt-3">1. Register</h5>
+                        <p class="card-text small text-muted">
+                            Create an account using your JAMB or admission number.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-file-earmark-text-fill text-primary fs-1"></i>
+                        <h5 class="card-title mt-3">2. Fill Profile</h5>
+                        <p class="card-text small text-muted">
+                            Provide personal and academic information.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-cloud-arrow-up-fill text-primary fs-1"></i>
+                        <h5 class="card-title mt-3">3. Upload Documents</h5>
+                        <p class="card-text small text-muted">
+                            Submit required documents for verification.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-patch-check-fill text-primary fs-1"></i>
+                        <h5 class="card-title mt-3">4. Get Confirmed</h5>
+                        <p class="card-text small text-muted">
+                            Track your status and download your confirmation slip.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
