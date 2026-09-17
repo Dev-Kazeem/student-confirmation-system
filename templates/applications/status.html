@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Application Status — {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="h4 fw-bold mb-1">Application Status</h1>
+    <p class="text-muted small mb-4">
+        Reference: <code>{{ application.reference }}</code>
+    </p>
+
+    {# Progress tracker #}
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <ol class="list-unstyled mb-0 small">
+                {% for status, label in stages %}
+                    {% with is_done=application.status == status %}
+                        {% with is_past=forloop.counter0 < stages|length %}
+                            <li class="d-flex align-items-start mb-3">
+                                <span class="me-3">
+                                    {% if application.status == 'REJECTED' and status == 'APPROVED' %}
+                                        <i class="bi bi-x-circle-fill text-danger fs-5"></i>
+                                    {% elif application.status == status %}
+                                        <i class="bi bi-record-circle-fill text-primary fs-5"></i>
+                                    {% else %}
+                                        <i class="bi bi-circle text-muted fs-5"></i>
+                                    {% endif %}
+                                </span>
+                                <div>
+                                    <div class="fw-semibold
+                                        {% if application.status == status %}text-primary{% endif %}">
+                                        {{ label }}
+                                    </div>
+                                    {% if status == 'SUBMITTED' and application.submitted_at %}
+                                        <div class="text-muted">{{ application.submitted_at|date:"M j, Y H:i" }}</div>
+                                    {% endif %}
+                                    {% if status == 'APPROVED' and application.approved_at %}
+                                        <div class="text-muted">{{ application.approved_at|date:"M j, Y H:i" }}</div>
+                                    {% endif %}
+                                </div>
+                            </li>
+                        {% endwith %}
+                    {% endwith %}
+                {% endfor %}
+            </ol>
+
+            {% if application.status == 'REJECTED' %}
+                <div class="alert alert-danger small mb-0">
+                    <strong>Rejected:</strong> {{ application.rejection_reason|default:"No reason recorded." }}
+                </div>
+            {% endif %}
+            {% if application.status == 'CORRECTION_REQUIRED' %}
+                <div class="alert alert-warning small mb-0">
+                    <strong>Correction required:</strong> {{ application.review_comment }}
+                    <div class="mt-2">
+                        <a href="{% url 'applications:preview' application.reference %}"
+                           class="btn btn-sm btn-primary">Update application</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {# Application summary #}
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h6 class="mb-0 fw-semibold">Summary</h6>
+        </div>
+        <div class="card-body">
+            <dl class="row mb-0 small">
+                <dt class="col-sm-4">Current status</dt>
+                <dd class="col-sm-8">
+                    <span class="badge bg-primary">{{ application.get_status_display }}</span>
+                </dd>
+                <dt class="col-sm-4">Programme</dt>
+                <dd class="col-sm-8">{{ application.admission_record.programme.name }}</dd>
+                <dt class="col-sm-4">Session</dt>
+                <dd class="col-sm-8">{{ application.admission_record.session.name }}</dd>
+                <dt class="col-sm-4">Reviewing officer</dt>
+                <dd class="col-sm-8">
+                    {% if application.reviewing_officer %}
+                        {{ application.reviewing_officer.get_full_name|default:application.reviewing_officer.username }}
+                    {% else %}—{% endif %}
+                </dd>
+                <dt class="col-sm-4">Last update</dt>
+                <dd class="col-sm-8">{{ application.updated_at|date:"M j, Y H:i" }}</dd>
+            </dl>
+        </div>
+    </div>
+
+    {# Review history #}
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+            <h6 class="mb-0 fw-semibold">History</h6>
+        </div>
+        <div class="card-body">
+            {% if application.reviews.exists %}
+                <ul class="list-unstyled small mb-0">
+                    {% for r in application.reviews.all %}
+                        <li class="mb-3 pb-3 border-bottom">
+                            <div class="d-flex justify-content-between">
+                                <strong>{{ r.get_action_display }}</strong>
+                                <span class="text-muted">{{ r.created_at|date:"M j, Y H:i" }}</span>
+                            </div>
+                            {% if r.comment %}<div class="text-muted mt-1">{{ r.comment }}</div>{% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted small mb-0">No review actions yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div

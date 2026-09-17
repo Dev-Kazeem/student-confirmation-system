@@ -68,17 +68,65 @@
         </div>
     {% endif %}
 
-    {# --- Step 3: application (Phase 5) --------------------------------------- #}
-    <div class="card border-0 shadow-sm mb-3 border-start border-secondary border-4">
-        <div class="card-body">
-            <h6 class="fw-bold mb-1">
-                <i class="bi bi-3-circle text-secondary me-1"></i> Submit your confirmation application
-            </h6>
-            <p class="small text-muted mb-0">
-                Available in Phase Five.
-            </p>
+   {# --- Step 3: application -------------------------------------------------- #}
+{% if profile.admission_record and profile.is_complete %}
+    {% with app=profile.user.applications.first %}
+        {% if app %}
+            <div class="card border-0 shadow-sm mb-3 border-start
+                {% if app.status == 'APPROVED' %}border-success
+                {% elif app.status == 'REJECTED' %}border-danger
+                {% elif app.status == 'CORRECTION_REQUIRED' %}border-warning
+                {% else %}border-primary{% endif %} border-4">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-1">
+                        <i class="bi bi-3-circle-fill text-primary me-1"></i>
+                        Application: {{ app.get_status_display }}
+                    </h6>
+                    <p class="small text-muted mb-2">
+                        Reference: <code>{{ app.reference }}</code>
+                    </p>
+                    <a href="{% url 'applications:status' app.reference %}"
+                       class="btn btn-primary btn-sm">
+                        <i class="bi bi-eye me-1"></i> View status
+                    </a>
+                    {% if app.is_editable %}
+                        <a href="{% url 'applications:preview' app.reference %}"
+                           class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-pencil me-1"></i> Continue
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+                <div class="card border-0 shadow-sm mb-3 border-start border-primary border-4">
+                    <div class="card-body">
+                        <h6 class="fw-bold mb-1">
+                            <i class="bi bi-3-circle-fill text-primary me-1"></i>
+                            Submit your confirmation application
+                        </h6>
+                        <p class="small text-muted mb-3">
+                            Fill out and submit your confirmation application with all required documents.
+                        </p>
+                        <a href="{% url 'applications:start' %}" class="btn btn-primary btn-sm">
+                            <i class="bi bi-play-circle me-1"></i> Start application
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        {% endwith %}
+    {% else %}
+        <div class="card border-0 shadow-sm mb-3 border-start border-secondary border-4">
+            <div class="card-body">
+                <h6 class="fw-bold mb-1 text-muted">
+                    <i class="bi bi-3-circle text-secondary me-1"></i>
+                    Submit your confirmation application
+                </h6>
+                <p class="small text-muted mb-0">
+                    Complete steps 1 and 2 first.
+                </p>
+            </div>
         </div>
-    </div>
+    {% endif %}
 
     <div class="mt-4">
         <a href="{% url 'accounts:student_profile' %}" class="btn btn-outline-primary btn-sm">

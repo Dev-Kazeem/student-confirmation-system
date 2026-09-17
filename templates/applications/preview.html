@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Application Preview — {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h4 fw-bold mb-1">Application Preview</h1>
+            <p class="text-muted small mb-0">
+                Reference: <code>{{ application.reference }}</code> —
+                Status: <span class="badge bg-secondary">{{ application.get_status_display }}</span>
+            </p>
+        </div>
+        <a href="{% url 'applications:status' application.reference %}"
+           class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-eye me-1"></i> Status page
+        </a>
+    </div>
+
+    {% if missing_docs %}
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle me-1"></i>
+            <strong>Required documents missing:</strong>
+            <ul class="mb-0 mt-1">
+                {% for dt in missing_docs %}<li>{{ dt.name }}</li>{% endfor %}
+            </ul>
+            <a href="{% url 'documents:manage' application.reference %}"
+               class="btn btn-sm btn-primary mt-2">
+                <i class="bi bi-cloud-arrow-up me-1"></i> Manage documents
+            </a>
+        </div>
+    {% endif %}
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0 fw-semibold">Personal Information</h6>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0 small">
+                        <dt class="col-sm-4">Full name</dt><dd class="col-sm-8">{{ profile.full_name }}</dd>
+                        <dt class="col-sm-4">Phone number</dt><dd class="col-sm-8">{{ profile.phone_number }}</dd>
+                        <dt class="col-sm-4">Date of birth</dt><dd class="col-sm-8">{{ profile.date_of_birth|date:"M j, Y" }}</dd>
+                        <dt class="col-sm-4">Gender</dt><dd class="col-sm-8">{{ profile.get_gender_display }}</dd>
+                        <dt class="col-sm-4">State of origin</dt><dd class="col-sm-8">{{ profile.state_of_origin }}</dd>
+                        <dt class="col-sm-4">LGA</dt><dd class="col-sm-8">{{ profile.lga }}</dd>
+                        <dt class="col-sm-4">Address</dt><dd class="col-sm-8">{{ profile.residential_address }}</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mt-3">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0 fw-semibold">Academic Information</h6>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0 small">
+                        <dt class="col-sm-4">JAMB number</dt><dd class="col-sm-8">{{ application.admission_record.jamb_number }}</dd>
+                        <dt class="col-sm-4">Admission number</dt><dd class="col-sm-8">{{ application.admission_record.admission_number|default:"—" }}</dd>
+                        <dt class="col-sm-4">Department</dt><dd class="col-sm-8">{{ application.admission_record.department.name }}</dd>
+                        <dt class="col-sm-4">Programme</dt><dd class="col-sm-8">{{ application.admission_record.programme.name }}</dd>
+                        <dt class="col-sm-4">Session</dt><dd class="col-sm-8">{{ application.admission_record.session.name }}</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mt-3">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-semibold">Documents</h6>
+                    <a href="{% url 'documents:manage' application.reference %}"
+                       class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-pencil me-1"></i> Manage
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if application.documents.exists %}
+                        <ul class="list-group list-group-flush small">
+                            {% for d in application.documents.all %}
+                                {% if not d.replaced_by %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                        <span>
+                                            <i class="bi bi-file-earmark-check text-success me-1"></i>
+                                            {{ d.document_type.name }}
+                                        </span>
+                                        <span class="badge bg-secondary">{{ d.get_status_display }}</span>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted small mb-0">No documents uploaded yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3">Submit</h6>
+
+                    {% if application.is_editable %}
+                        <form method="post" novalidate>
+                            {% csrf_token %}
+                            <div class="form-check mb-3">
+                                {{ form.confirm }}
+                                <label class="form-check-label small" for="{{ form.confirm.id_for_label }}">
+                                    {{ form.confirm.label }}
+                                </label>
+                                {% for e in form.confirm.errors %}
+                                    <div class="text-danger small">{{ e }}</div>
+                                {% endfor %}
+                            </div>
+                            <button type="submit" class="btn btn-success w-100"
+                                    {% if missing_docs %}disabled{% endif %}>
+                                <i class="bi bi-send-check me-1"></i>
+                                {% if application.status == "CORRECTION_REQUIRED" %}Resubmit{% else %}Submit{% endif %}
+                            </button>
+                            {% if missing_docs %}
+                                <p class="small text-muted mt-2 mb-0">
+                                    Upload all required documents to enable submission.
+                                </p>
+                            {% endif %}
+                        </form>
+                    {% else %}
+                        <p class="small text-muted mb-0">
+                            This application is in state <strong>{{ application.get_status_display }}</strong>
+                            and cannot be edited or submitted now.
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="alert alert-info small mt-3 mb-0">
+                <i class="bi bi-info-circle me-1"></i>
+                After submission you cannot change your information unless an officer returns the application for correction.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
