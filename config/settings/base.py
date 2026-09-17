@@ -84,6 +84,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "core.context_processors.site_metadata",
+                "notifications.context_processors.notifications",
             ],
         },
     },
@@ -203,4 +204,21 @@ LOGGING = {
     },
 }
 
+
+
+# -------------------------------------------------------------------
+# Notifications
+# -------------------------------------------------------------------
+NOTIFICATIONS_EMAIL_ENABLED = config("NOTIFICATIONS_EMAIL_ENABLED", default=True, cast=bool)
+
+# -------------------------------------------------------------------
+# Confirmation slips
+# -------------------------------------------------------------------
+# Base URL used in the verification QR. In production this must be your real host.
+SITE_BASE_URL = config("SITE_BASE_URL", default="http://127.0.0.1:8000")
+CONFIRMATION_VERIFY_PATH = "/confirmations/verify/"
+
+# -------------------------------------------------------------------
+# Message Tags — already set earlier, keep this comment for location
+# -------------------------------------------------------------------
 

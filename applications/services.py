@@ -14,7 +14,7 @@ from notifications.models import Notification
 
 from .models import Application, ApplicationReview
 
-
+from notifications.services import notify
 # ---------------------------------------------------------------------------
 # Creation
 # ---------------------------------------------------------------------------
@@ -106,14 +106,14 @@ def submit_application(application, *, by_user):
         target=application,
     )
 
-    Notification.objects.create(
+    notify(
         recipient=by_user,
         title="Application submitted",
         message=(
             "Your confirmation application has been submitted successfully. "
             "You will be notified when it is reviewed."
         ),
-        type=Notification.Type.APPLICATION_SUBMITTED,
+        notification_type=Notification.Type.APPLICATION_SUBMITTED,
         link_url="/applications/status/",
     )
 
@@ -176,22 +176,24 @@ def request_correction(application, *, officer, reason: str):
         description=f"Requested correction on {application.reference}.",
         target=application,
     )
-    Notification.objects.create(
-        recipient=application.student,
-        title="Correction required",
+    notify(
+        recipient=by_user,
+        title="Application submitted",
         message=(
-            "Your application needs corrections. Please review the officer's comments "
-            "and resubmit."
+            "Your confirmation application has been submitted successfully. "
+            "You will be notified when it is reviewed."
         ),
-        type=Notification.Type.CORRECTION_REQUESTED,
-        link_url=f"/applications/{application.reference}/status/",
+        notification_type=Notification.Type.APPLICATION_SUBMITTED,
+        link_url="/applications/status/",
     )
     return application
 
 
 @transaction.atomic
 def approve_application(application, *, officer, comment: str = ""):
-    """UNDER_REVIEW → APPROVED."""
+    """UNDER_REVIEW → APPROVED. Generates the confirmation slip."""
+    from confirmations.services import generate_slip  # avoid circular import
+
     if application.status != Application.Status.UNDER_REVIEW:
         raise ValueError("Only applications under review can be approved.")
 
@@ -216,16 +218,21 @@ def approve_application(application, *, officer, comment: str = ""):
         description=f"Approved application {application.reference}.",
         target=application,
     )
-    Notification.objects.create(
+
+    notify(
         recipient=application.student,
         title="Application approved",
         message=(
             "Congratulations! Your confirmation application has been approved. "
             "Your confirmation slip is now available."
         ),
-        type=Notification.Type.APPLICATION_APPROVED,
+        notification_type=Notification.Type.APPLICATION_APPROVED,
         link_url=f"/applications/{application.reference}/status/",
     )
+
+    # Generate slip — if this fails, the whole transaction rolls back
+    generate_slip(application, by_user=officer)
+
     return application
 
 
@@ -263,11 +270,14 @@ def reject_application(application, *, officer, reason: str):
         description=f"Rejected application {application.reference}.",
         target=application,
     )
-    Notification.objects.create(
-        recipient=application.student,
-        title="Application rejected",
-        message=f"Your application was rejected. Reason: {reason}",
-        type=Notification.Type.APPLICATION_REJECTED,
-        link_url=f"/applications/{application.reference}/status/",
+    notify(
+        recipient=by_user,
+        title="Application submitted",
+        message=(
+            "Your confirmation application has been submitted successfully. "
+            "You will be notified when it is reviewed."
+        ),
+        notification_type=Notification.Type.APPLICATION_SUBMITTED,
+        link_url="/applications/status/",
     )
     return application

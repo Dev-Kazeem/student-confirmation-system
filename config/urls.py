@@ -25,6 +25,8 @@ urlpatterns = [
     path("admissions/", include(("admissions.urls", "admissions"), namespace="admissions")),
     path("applications/", include(("applications.urls", "applications"), namespace="applications")),
     path("documents/", include(("documents.urls", "documents"), namespace="documents")),
+    path("notifications/", include(("notifications.urls", "notifications"), namespace="notifications")),
+    path("confirmations/", include(("confirmations.urls", "confirmations"), namespace="confirmations")),
     path("", include(("core.urls", "core"), namespace="core")),
 ]
 

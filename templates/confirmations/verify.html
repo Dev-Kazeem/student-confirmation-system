@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Verify a Confirmation Slip — {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="text-center mb-4">
+                <i class="bi bi-shield-check text-primary" style="font-size: 3rem;"></i>
+                <h1 class="h3 fw-bold mt-2">Verify a Confirmation Slip</h1>
+                <p class="text-muted small mb-0">
+                    Enter the verification code printed on the slip, or scan its QR code.
+                </p>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Verification code</label>
+                            <input type="text" name="code" value="{{ code }}"
+                                   class="form-control form-control-lg"
+                                   placeholder="e.g. 550e8400-e29b-41d4-a716-446655440000"
+                                   autofocus>
+                        </div>
+                        <button class="btn btn-primary w-100">
+                            <i class="bi bi-shield-check me-1"></i> Verify
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            {% if result == "valid" %}
+                <div class="card border-0 shadow-sm border-start border-success border-4">
+                    <div class="card-body">
+                        <h5 class="fw-bold text-success mb-3">
+                            <i class="bi bi-check-circle-fill me-1"></i> Valid Confirmation Slip
+                        </h5>
+                        <dl class="row mb-0 small">
+                            <dt class="col-sm-4">Student name</dt>
+                            <dd class="col-sm-8">
+                                {{ slip.application.student.student_profile.full_name|default:slip.application.student.get_full_name }}
+                            </dd>
+                            <dt class="col-sm-4">Programme</dt>
+                            <dd class="col-sm-8">{{ slip.application.admission_record.programme.name }}</dd>
+                            <dt class="col-sm-4">Department</dt>
+                            <dd class="col-sm-8">{{ slip.application.admission_record.department.name }}</dd>
+                            <dt class="col-sm-4">Session</dt>
+                            <dd class="col-sm-8">{{ slip.application.session.name }}</dd>
+                            <dt class="col-sm-4">Confirmed on</dt>
+                            <dd class="col-sm-8">{{ slip.generated_at|date:"F j, Y" }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            {% elif result == "revoked" %}
+                <div class="alert alert-danger">
+                    <h5 class="fw-bold"><i class="bi bi-x-octagon-fill me-1"></i> Confirmation Slip Revoked</h5>
+                    <p class="small mb-0">This slip has been revoked and is no longer valid.</p>
+                </div>
+            {% elif result == "not_found" %}
+                <div class="alert alert-warning">
+                    <h5 class="fw-bold"><i class="bi bi-question-circle-fill me-1"></i> Record Not Found</h5>
+                    <p class="small mb-0">No confirmation slip matches that code.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
