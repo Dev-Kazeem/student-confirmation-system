@@ -1,7 +1,10 @@
 """
 Document helper functions — required-document detection and upload validation.
 """
+import django.utils.timezone as tz  # noqa: E402
 
+from auditlogs.models import AuditLog  # noqa: E402
+from notifications.models import Notification  # noqa: E402
 from .models import Document, DocumentType
 
 
@@ -43,3 +46,60 @@ def validate_upload(*, document_type: DocumentType, uploaded_file) -> tuple[bool
         return False, "The uploaded file is empty."
 
     return True, ""
+
+
+
+
+def review_document(document, *, officer, status: str, comment: str = ""):
+    """
+    Set a document's review status and record the action.
+
+    status must be one of Document.Status.{ACCEPTED, REJECTED, CORRECTION_REQUIRED}.
+
+    Sending a document back for correction also flips its parent application
+    into CORRECTION_REQUIRED if that application is currently UNDER_REVIEW.
+    """
+    from applications.models import Application  # avoid circular import
+
+    if status not in (
+        Document.Status.ACCEPTED,
+        Document.Status.REJECTED,
+        Document.Status.CORRECTION_REQUIRED,
+    ):
+        raise ValueError("Invalid document status.")
+    if status in (Document.Status.REJECTED, Document.Status.CORRECTION_REQUIRED) and not comment.strip():
+        raise ValueError("A comment is required for rejection or correction.")
+
+    document.status = status
+    document.review_comment = comment
+    document.reviewed_by = officer
+    document.reviewed_at = tz.now()
+    document.save(update_fields=["status", "review_comment", "reviewed_by", "reviewed_at", "updated_at"])
+
+    AuditLog.record(
+        user=officer,
+        action=AuditLog.Action.DOCUMENT_REVIEW,
+        description=f"Marked document '{document.document_type.name}' as {status}.",
+        target=document,
+    )
+
+    if status in (Document.Status.REJECTED, Document.Status.CORRECTION_REQUIRED):
+        Notification.objects.create(
+            recipient=document.application.student,
+            title=f"Document {document.get_status_display().lower()}",
+            message=(
+                f"Your document '{document.document_type.name}' requires attention: "
+                f"{comment}"
+            ),
+            type=Notification.Type.DOCUMENT_REJECTED,
+            link_url=f"/documents/{document.application.reference}/manage/",
+        )
+        # Send the whole application back for correction
+        if document.application.status == Application.Status.UNDER_REVIEW:
+            document.application.status = Application.Status.CORRECTION_REQUIRED
+            document.application.review_comment = (
+                f"Document '{document.document_type.name}' requires correction: {comment}"
+            )
+            document.application.save(update_fields=["status", "review_comment", "updated_at"])
+
+    return document

@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Officer Dashboard — {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h4 fw-bold mb-1">Officer Dashboard</h1>
+            <p class="text-muted small mb-0">
+                Welcome, {{ user.get_full_name|default:user.username }}
+            </p>
+        </div>
+        <a href="{% url 'applications:officer_list' %}" class="btn btn-primary btn-sm">
+            <i class="bi bi-list-ul me-1"></i> Application queue
+        </a>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Total applications</div>
+                    <div class="fs-3 fw-bold">{{ stats.total }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Submitted</div>
+                    <div class="fs-3 fw-bold text-primary">{{ stats.submitted }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Under review</div>
+                    <div class="fs-3 fw-bold text-info">{{ stats.under_review }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Correction required</div>
+                    <div class="fs-3 fw-bold text-warning">{{ stats.correction_required }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Resubmitted</div>
+                    <div class="fs-3 fw-bold text-secondary">{{ stats.resubmitted }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Approved</div>
+                    <div class="fs-3 fw-bold text-success">{{ stats.approved }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Rejected</div>
+                    <div class="fs-3 fw-bold text-danger">{{ stats.rejected }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Pending documents</div>
+                    <div class="fs-3 fw-bold text-warning">{{ pending_docs }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h6 class="mb-0 fw-semibold">Recent activity</h6>
+            <a href="{% url 'applications:officer_list' %}" class="small">View all</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle small">
+                <thead class="table-light">
+                    <tr>
+                        <th>Reference</th>
+                        <th>Student</th>
+                        <th>Status</th>
+                        <th>Updated</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for app in recent %}
+                        <tr>
+                            <td><code>{{ app.reference|slice:":8" }}…</code></td>
+                            <td>{{ app.student.get_full_name|default:app.student.username }}</td>
+                            <td><span class="badge bg-secondary">{{ app.get_status_display }}</span></td>
+                            <td>{{ app.updated_at|date:"M j, Y H:i" }}</td>
+                            <td class="text-end">
+                                <a href="{% url 'applications:officer_detail' app.reference %}"
+                                   class="btn btn-sm btn-outline-primary">Open</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="5" class="text-muted text-center py-3">No activity yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -22,42 +22,42 @@ class DocumentManageView(StudentOwnsApplicationMixin, View):
     template_name = "documents/manage.html"
 
     def get(self, request, *args, **kwargs):
-    application = self.application
-    if not application.is_editable:
-        messages.info(
+        application = self.application
+        if not application.is_editable:
+            messages.info(
+                request,
+                "Your application is under review; documents cannot be changed now.",
+            )
+            return redirect("applications:status", reference=application.reference)
+
+        required_types = list(DocumentType.objects.filter(is_required=True, is_active=True))
+        optional_types = list(DocumentType.objects.filter(is_required=False, is_active=True))
+
+        active_docs_qs = Document.objects.filter(
+            application=application, replaced_by__isnull=True
+        ).select_related("document_type")
+
+        # { document_type_id: Document }
+        active_docs = {d.document_type_id: d for d in active_docs_qs}
+
+        # [{ type: DocumentType, current: Document|None }, ...]
+        required_rows = [
+            {"type": dt, "current": active_docs.get(dt.pk)} for dt in required_types
+        ]
+        optional_rows = [
+            {"type": dt, "current": active_docs.get(dt.pk)} for dt in optional_types
+        ]
+
+        return render(
             request,
-            "Your application is under review; documents cannot be changed now.",
+            self.template_name,
+            {
+                "application": application,
+                "required_rows": required_rows,
+                "optional_rows": optional_rows,
+                "missing": missing_required_document_types(application),
+            },
         )
-        return redirect("applications:status", reference=application.reference)
-
-    required_types = list(DocumentType.objects.filter(is_required=True, is_active=True))
-    optional_types = list(DocumentType.objects.filter(is_required=False, is_active=True))
-
-    active_docs_qs = Document.objects.filter(
-        application=application, replaced_by__isnull=True
-    ).select_related("document_type")
-
-    # { document_type_id: Document }
-    active_docs = {d.document_type_id: d for d in active_docs_qs}
-
-    # [{ type: DocumentType, current: Document|None }, ...]
-    required_rows = [
-        {"type": dt, "current": active_docs.get(dt.pk)} for dt in required_types
-    ]
-    optional_rows = [
-        {"type": dt, "current": active_docs.get(dt.pk)} for dt in optional_types
-    ]
-
-    return render(
-        request,
-        self.template_name,
-        {
-            "application": application,
-            "required_rows": required_rows,
-            "optional_rows": optional_rows,
-            "missing": missing_required_document_types(application),
-        },
-    )
 
 
 # ---------------------------------------------------------------------------

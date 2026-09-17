@@ -123,7 +123,8 @@ def officer_dashboard(request):
     if not (request.user.is_officer or request.user.is_superuser):
         messages.warning(request, "You are not authorized to view the officer dashboard.")
         return redirect("accounts:redirect_after_login")
-    return render(request, "accounts/officer_dashboard.html")
+    # Redirect to the real officer dashboard
+    return redirect("applications:officer_dashboard")
 
 
 @login_required

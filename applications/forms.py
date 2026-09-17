@@ -28,3 +28,55 @@ class ApplicationForm(forms.ModelForm):
     def __init__(self, *args, application: Application = None, **kwargs):
         super().__init__(*args, **kwargs)
         self.application = application
+
+
+class CorrectionRequestForm(forms.Form):
+    reason = forms.CharField(
+        label="Reason for correction",
+        widget=forms.Textarea(
+            attrs={
+                "class": "form-control",
+                "rows": 4,
+                "placeholder": "Explain what needs to be corrected and why.",
+            }
+        ),
+    )
+
+    def clean_reason(self):
+        reason = self.cleaned_data["reason"].strip()
+        if len(reason) < 10:
+            raise forms.ValidationError("Please provide a more detailed reason (at least 10 characters).")
+        return reason
+
+
+class RejectApplicationForm(forms.Form):
+    reason = forms.CharField(
+        label="Reason for rejection",
+        widget=forms.Textarea(
+            attrs={
+                "class": "form-control",
+                "rows": 4,
+                "placeholder": "Explain why this application is being rejected.",
+            }
+        ),
+    )
+
+    def clean_reason(self):
+        reason = self.cleaned_data["reason"].strip()
+        if len(reason) < 10:
+            raise forms.ValidationError("Please provide a more detailed reason (at least 10 characters).")
+        return reason
+
+
+class ApproveApplicationForm(forms.Form):
+    comment = forms.CharField(
+        label="Comment (optional)",
+        required=False,
+        widget=forms.Textarea(
+            attrs={
+                "class": "form-control",
+                "rows": 3,
+                "placeholder": "Optional note to the student.",
+            }
+        ),
+    )
