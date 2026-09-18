@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Import Admission Records — {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="h4 fw-bold mb-4">Import Admission Records</h1>
+    {% include "partials/_admin_nav.html" %}
+
+    <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">CSV file</label>
+                    {{ form.csv_file }}
+                    <div class="form-text">{{ form.csv_file.help_text }}</div>
+                    {% for e in form.csv_file.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+                </div>
+                <button class="btn btn-primary"><i class="bi bi-upload me-1"></i> Import</button>
+                <a href="{% url 'admissions:admin_list' %}" class="btn btn-outline-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+
+    {% if result %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h6 class="fw-bold">Import summary</h6>
+                <ul class="small mb-0">
+                    <li>Created: <strong>{{ result.created }}</strong></li>
+                    <li>Updated: <strong>{{ result.updated }}</strong></li>
+                    <li>Errors: <strong>{{ result.errors|length }}</strong></li>
+                </ul>
+                {% if result.errors %}
+                    <hr>
+                    <div class="small text-danger" style="max-height:300px; overflow:auto;">
+                        {% for e in result.errors %}<div>{{ e }}</div>{% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

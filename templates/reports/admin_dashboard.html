@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard — {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="h4 fw-bold mb-4">Administrator Dashboard</h1>
+
+    {% include "partials/_admin_nav.html" %}
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100"><div class="card-body">
+                <div class="text-muted small">Students</div>
+                <div class="fs-3 fw-bold">{{ stats.students }}</div>
+            </div></div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100"><div class="card-body">
+                <div class="text-muted small">Applications</div>
+                <div class="fs-3 fw-bold">{{ stats.applications }}</div>
+            </div></div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100"><div class="card-body">
+                <div class="text-muted small">Approved</div>
+                <div class="fs-3 fw-bold text-success">{{ stats.approved }}</div>
+            </div></div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100"><div class="card-body">
+                <div class="text-muted small">Rejected</div>
+                <div class="fs-3 fw-bold text-danger">{{ stats.rejected }}</div>
+            </div></div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100"><div class="card-body">
+                <div class="text-muted small">Under review</div>
+                <div class="fs-3 fw-bold text-info">{{ stats.under_review }}</div>
+            </div></div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100"><div class="card-body">
+                <div class="text-muted small">Correction required</div>
+                <div class="fs-3 fw-bold text-warning">{{ stats.correction_required }}</div>
+            </div></div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100"><div class="card-body">
+                <div class="text-muted small">Documents</div>
+                <div class="fs-3 fw-bold">{{ stats.documents }}</div>
+                <div class="small text-warning">{{ stats.pending_documents }} pending</div>
+            </div></div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100"><div class="card-body">
+                <div class="text-muted small">Slips issued</div>
+                <div class="fs-3 fw-bold text-primary">{{ stats.slips }}</div>
+            </div></div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white"><h6 class="mb-0 fw-semibold">Recent applications</h6></div>
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0 small align-middle">
+                        <thead class="table-light">
+                            <tr><th>Reference</th><th>Student</th><th>Status</th><th>Updated</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for a in recent_apps %}
+                                <tr>
+                                    <td><code>{{ a.reference|slice:":8" }}…</code></td>
+                                    <td>{{ a.student.get_full_name|default:a.student.username }}</td>
+                                    <td><span class="badge bg-secondary">{{ a.get_status_display }}</span></td>
+                                    <td>{{ a.updated_at|date:"M j, H:i" }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="4" class="text-muted text-center py-3">No applications.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-header bg-white"><h6 class="mb-0 fw-semibold">Recent activity</h6></div>
+                <ul class="list-group list-group-flush small">
+                    {% for log in recent_audits %}
+                        <li class="list-group-item">
+                            <div>{{ log.get_action_display }}</div>
+                            <div class="text-muted">{{ log.user|default:"system" }} — {{ log.created_at|date:"M j, H:i" }}</div>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item text-muted">No activity.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white"><h6 class="mb-0 fw-semibold">Top departments</h6></div>
+                <ul class="list-group list-group-flush small">
+                    {% for d in dept_breakdown %}
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>{{ d.name }}</span>
+                            <span class="text-muted">{{ d.total }} apps / {{ d.approved }} approved</span>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item text-muted">No data.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

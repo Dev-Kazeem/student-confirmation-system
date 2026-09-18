@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Audit Log — {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="h4 fw-bold mb-4">Audit Log Entry</h1>
+
+    {% include "partials/_admin_nav.html" %}
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <dl class="row mb-0 small">
+                <dt class="col-sm-3">Time</dt><dd class="col-sm-9">{{ log.created_at }}</dd>
+                <dt class="col-sm-3">User</dt><dd class="col-sm-9">{{ log.user|default:"—" }}</dd>
+                <dt class="col-sm-3">Action</dt><dd class="col-sm-9">{{ log.get_action_display }}</dd>
+                <dt class="col-sm-3">Description</dt><dd class="col-sm-9">{{ log.description }}</dd>
+                <dt class="col-sm-3">Target</dt><dd class="col-sm-9">{{ log.target_type }} #{{ log.target_id }}</dd>
+                <dt class="col-sm-3">IP</dt><dd class="col-sm-9">{{ log.ip_address|default:"—" }}</dd>
+                <dt class="col-sm-3">User agent</dt><dd class="col-sm-9 text-break">{{ log.user_agent|default:"—" }}</dd>
+            </dl>
+        </div>
+    </div>
+
+    <a href="{% url 'auditlogs:list' %}" class="btn btn-outline-secondary btn-sm mt-3">
+        <i class="bi bi-arrow-left me-1"></i> Back
+    </a>
+</div>
+{% endblock %}

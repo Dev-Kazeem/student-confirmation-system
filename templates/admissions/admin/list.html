@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Admission Records — {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h4 fw-bold mb-0">Admission Records</h1>
+        <div>
+            <a href="{% url 'admissions:admin_import' %}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-upload me-1"></i> Import CSV
+            </a>
+            <a href="{% url 'admissions:admin_create' %}" class="btn btn-sm btn-primary">
+                <i class="bi bi-plus-circle me-1"></i> Add record
+            </a>
+        </div>
+    </div>
+
+    {% include "partials/_admin_nav.html" %}
+
+    <form method="get" class="card border-0 shadow-sm mb-3">
+        <div class="card-body">
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <input type="text" name="q" value="{{ filters.q }}" class="form-control form-control-sm" placeholder="Search JAMB / name / admission no…">
+                </div>
+                <div class="col-md-3">
+                    <select name="status" class="form-select form-select-sm">
+                        <option value="">All statuses</option>
+                        {% for v, l in statuses %}
+                            <option value="{{ v }}" {% if filters.status == v %}selected{% endif %}>{{ l }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="session" class="form-select form-select-sm">
+                        <option value="">All sessions</option>
+                        {% for s in sessions %}
+                            <option value="{{ s.pk }}" {% if filters.session == s.pk|stringformat:"s" %}selected{% endif %}>{{ s.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 d-grid">
+                    <button class="btn btn-sm btn-primary">Filter</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0 small align-middle">
+                <thead class="table-light">
+                    <tr><th>JAMB</th><th>Name</th><th>Admission no</th><th>Dept</th><th>Programme</th><th>Session</th><th>Status</th><th></th></tr>
+                </thead>
+                <tbody>
+                    {% for r in page %}
+                        <tr>
+                            <td>{{ r.jamb_number }}</td>
+                            <td>{{ r.student_name }}</td>
+                            <td>{{ r.admission_number|default:"—" }}</td>
+                            <td>{{ r.department.name }}</td>
+                            <td>{{ r.programme.name }}</td>
+                            <td>{{ r.session.name }}</td>
+                            <td><span class="badge bg-secondary">{{ r.get_status_display }}</span></td>
+                            <td><a href="{% url 'admissions:admin_edit' r.pk %}" class="btn btn-sm btn-outline-primary">Edit</a></td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="8" class="text-center text-muted py-3">No records.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <p class="small text-muted mt-2">Total: {{ total }}</p>
+
+    {% if page.has_other_pages %}
+        <nav>
+            <ul class="pagination pagination-sm">
+                {% if page.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page.previous_page_number }}&q={{ filters.q }}&status={{ filters.status }}&session={{ filters.session }}">Previous</a></li>
+                {% endif %}
+                <li class="page-item disabled"><span class="page-link">Page {{ page.number }} of {{ page.paginator.num_pages }}</span></li>
+                {% if page.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page.next_page_number }}&q={{ filters.q }}&status={{ filters.status }}&session={{ filters.session }}">Next</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+</div>
+{% endblock %}

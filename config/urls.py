@@ -27,9 +27,16 @@ urlpatterns = [
     path("documents/", include(("documents.urls", "documents"), namespace="documents")),
     path("notifications/", include(("notifications.urls", "notifications"), namespace="notifications")),
     path("confirmations/", include(("confirmations.urls", "confirmations"), namespace="confirmations")),
+    path("reports/", include(("reports.urls", "reports"), namespace="reports")),
+    path("auditlogs/", include(("auditlogs.urls", "auditlogs"), namespace="auditlogs")),
     path("", include(("core.urls", "core"), namespace="core")),
 ]
 
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+handler404 = "core.views.error_404"
+handler500 = "core.views.error_500"
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

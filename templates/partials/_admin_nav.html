@@ -1,0 +1,35 @@
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body py-2">
+        <ul class="nav nav-pills small flex-wrap">
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.namespace == 'reports' and request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}"
+                   href="{% url 'reports:admin_dashboard' %}">
+                    <i class="bi bi-speedometer2 me-1"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.namespace == 'reports' and request.resolver_match.url_name != 'admin_dashboard' %}active{% endif %}"
+                   href="{% url 'reports:index' %}">
+                    <i class="bi bi-file-earmark-bar-graph me-1"></i> Reports
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.namespace == 'auditlogs' %}active{% endif %}"
+                   href="{% url 'auditlogs:list' %}">
+                    <i class="bi bi-journal-text me-1"></i> Audit Logs
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'admin_list' %}active{% endif %}"
+                   href="{% url 'admissions:admin_list' %}">
+                    <i class="bi bi-mortarboard me-1"></i> Admission Records
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/admin/">
+                    <i class="bi bi-gear me-1"></i> Django Admin
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>

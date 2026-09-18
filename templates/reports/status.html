@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Application Status Report — {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h4 fw-bold mb-0">Application Status Report</h1>
+        <a href="{% url 'reports:export_status' %}?{{ request.GET.urlencode }}" class="btn btn-sm btn-primary">
+            <i class="bi bi-filetype-csv me-1"></i> Export CSV
+        </a>
+    </div>
+
+    {% include "partials/_admin_nav.html" %}
+    {% include "reports/_filter_bar.html" %}
+
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0 small align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Reference</th><th>Student</th><th>JAMB</th><th>Programme</th>
+                        <th>Session</th><th>Status</th><th>Reviewer</th><th>Updated</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in applications %}
+                        <tr>
+                            <td><code>{{ a.reference|slice:":8" }}…</code></td>
+                            <td>{{ a.student.get_full_name|default:a.student.username }}</td>
+                            <td>{{ a.admission_record.jamb_number }}</td>
+                            <td>{{ a.admission_record.programme.name }}</td>
+                            <td>{{ a.session.name }}</td>
+                            <td><span class="badge bg-secondary">{{ a.get_status_display }}</span></td>
+                            <td>{{ a.reviewing_officer.get_full_name|default:a.reviewing_officer.username|default:"—" }}</td>
+                            <td>{{ a.updated_at|date:"M j, Y" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="8" class="text-center text-muted py-3">No applications match your filters.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer small text-muted">Showing first 500 of {{ total }}. Export CSV for the full set.</div>
+    </div>
+</div>
+{% endblock %}

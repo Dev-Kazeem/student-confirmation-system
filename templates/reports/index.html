@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Reports — {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="h4 fw-bold mb-4">Reports</h1>
+
+    {% include "partials/_admin_nav.html" %}
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="fw-bold"><i class="bi bi-list-check text-primary me-1"></i> Application status</h6>
+                    <p class="small text-muted">All applications with current status and reviewer.</p>
+                    <a href="{% url 'reports:status' %}" class="btn btn-sm btn-primary">Open</a>
+                    <a href="{% url 'reports:export_status' %}" class="btn btn-sm btn-outline-primary">CSV</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="fw-bold"><i class="bi bi-building text-primary me-1"></i> By department</h6>
+                    <p class="small text-muted">Aggregated counts per department.</p>
+                    <a href="{% url 'reports:department' %}" class="btn btn-sm btn-primary">Open</a>
+                    <a href="{% url 'reports:export_department' %}" class="btn btn-sm btn-outline-primary">CSV</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="fw-bold"><i class="bi bi-check-circle text-success me-1"></i> Approved students</h6>
+                    <p class="small text-muted">Every approved application with verification code.</p>
+                    <a href="{% url 'reports:approved' %}" class="btn btn-sm btn-primary">Open</a>
+                    <a href="{% url 'reports:export_approved' %}" class="btn btn-sm btn-outline-primary">CSV</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="fw-bold"><i class="bi bi-x-circle text-danger me-1"></i> Rejected applications</h6>
+                    <p class="small text-muted">Rejected applications with reasons.</p>
+                    <a href="{% url 'reports:rejected' %}" class="btn btn-sm btn-primary">Open</a>
+                    <a href="{% url 'reports:export_rejected' %}" class="btn btn-sm btn-outline-primary">CSV</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="fw-bold"><i class="bi bi-hourglass-split text-warning me-1"></i> Pending review</h6>
+                    <p class="small text-muted">Applications awaiting or in review.</p>
+                    <a href="{% url 'reports:pending' %}" class="btn btn-sm btn-primary">Open</a>
+                    <a href="{% url 'reports:export_pending' %}" class="btn btn-sm btn-outline-primary">CSV</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="fw-bold"><i class="bi bi-file-earmark-check text-primary me-1"></i> Document verification</h6>
+                    <p class="small text-muted">Status of every uploaded document.</p>
+                    <a href="{% url 'reports:documents' %}" class="btn btn-sm btn-primary">Open</a>
+                    <a href="{% url 'reports:export_documents' %}" class="btn btn-sm btn-outline-primary">CSV</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
