@@ -6,7 +6,6 @@ Local development settings.
 - Console email backend
 - Django serves static files itself
 """
-
 from .base import *  # noqa: F401, F403
 from .base import BASE_DIR
 

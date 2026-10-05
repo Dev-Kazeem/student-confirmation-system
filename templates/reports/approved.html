@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Approved Students — {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h4 fw-bold mb-0">Approved Students</h1>
+        <a href="{% url 'reports:export_approved' %}?{{ request.GET.urlencode }}" class="btn btn-sm btn-primary">
+            <i class="bi bi-filetype-csv me-1"></i> Export CSV
+        </a>
+    </div>
+
+    {% include "partials/_admin_nav.html" %}
+    {% include "reports/_filter_bar.html" %}
+
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0 small align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Reference</th>
+                        <th>Student</th>
+                        <th>JAMB</th>
+                        <th>Admission No</th>
+                        <th>Programme</th>
+                        <th>Session</th>
+                        <th>Approved</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in applications %}
+                        <tr>
+                            <td><code>{{ a.reference|slice:":8" }}…</code></td>
+                            <td>{{ a.student.get_full_name|default:a.student.username }}</td>
+                            <td>{{ a.admission_record.jamb_number }}</td>
+                            <td>{{ a.admission_record.admission_number|default:"—" }}</td>
+                            <td>{{ a.admission_record.programme.name }}</td>
+                            <td>{{ a.session.name }}</td>
+                            <td>{{ a.approved_at|date:"M j, Y" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-3">
+                                No approved applications match your filters.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer small text-muted">
+            Showing first 500 of {{ total }}. Export CSV for the full set.
+        </div>
+    </div>
+</div>
+{% endblock %}

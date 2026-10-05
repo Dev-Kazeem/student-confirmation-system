@@ -27,6 +27,7 @@ ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="127.0.0.1,localhost", cast=Csv(
 # Applications
 # -------------------------------------------------------------------
 DJANGO_APPS = [
+    'jazzmin',
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -52,6 +53,61 @@ THIRD_PARTY_APPS = [
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
+#----------------------------------------------------------------
+# Jazzmin Configuration
+#----------------------------------------------------------------
+JAZZMIN_SETTINGS = {
+     "site_title": "UDUS Confirmation Portal",
+    "site_header": "Usmanu Danfodiyo University",
+    "site_brand": "UDUS Portal",
+    "welcome_sign": "Welcome to the Confirmation System Admin",
+    "copyright": "Usmanu Danfodiyo University, Sokoto",
+    "show_ui_builder": False,
+    "order_with_respect_to": [
+        "applications",
+        "accounts",
+        "admissions",
+        "documents",
+        "confirmations",
+        "notifications",
+        "reports",
+        "auditlogs",
+    ],
+
+    "topmenu_links": [
+        {
+            "name": "Home Page",
+            "url": "core:home",
+            "permissions": ["auth.view_user"],
+            "icon": "fas fa-home",
+        },
+
+         {
+            "name": "My Dashboard",
+            "url": "accounts:redirect_after_login",
+            "icon": "fas fa-tachometer-alt",
+        },
+    ]
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "theme": "flatly",
+    "sidebar": "sidebar-dark-primary",
+    "navbar": "navbar-dark-primary",
+    "brand_colour": "navbar-primary",
+    "accent": "accent-primary",
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-outline-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success",
+    },
+}
+
 
 # -------------------------------------------------------------------
 # Middleware

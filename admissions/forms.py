@@ -14,11 +14,11 @@ class AdmissionCheckForm(forms.Form):
         widget=forms.TextInput(
             attrs={
                 "class": "form-control form-control-lg",
-                "placeholder": "e.g. 20241234567 or UDS/CSC/24/0001",
+                "placeholder": "e.g. 202612345678FG",
                 "autofocus": True,
             }
         ),
-        help_text="Enter either your JAMB registration number or your admission number.",
+        help_text="Enter your JAMB registration number.",
     )
 
     def clean_identifier(self):

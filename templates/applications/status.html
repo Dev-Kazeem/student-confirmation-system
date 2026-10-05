@@ -14,33 +14,28 @@
         <div class="card-body">
             <ol class="list-unstyled mb-0 small">
                 {% for status, label in stages %}
-                    {% with is_done=application.status == status %}
-                        {% with is_past=forloop.counter0 < stages|length %}
-                            <li class="d-flex align-items-start mb-3">
-                                <span class="me-3">
-                                    {% if application.status == 'REJECTED' and status == 'APPROVED' %}
-                                        <i class="bi bi-x-circle-fill text-danger fs-5"></i>
-                                    {% elif application.status == status %}
-                                        <i class="bi bi-record-circle-fill text-primary fs-5"></i>
-                                    {% else %}
-                                        <i class="bi bi-circle text-muted fs-5"></i>
-                                    {% endif %}
-                                </span>
-                                <div>
-                                    <div class="fw-semibold
-                                        {% if application.status == status %}text-primary{% endif %}">
-                                        {{ label }}
-                                    </div>
-                                    {% if status == 'SUBMITTED' and application.submitted_at %}
-                                        <div class="text-muted">{{ application.submitted_at|date:"M j, Y H:i" }}</div>
-                                    {% endif %}
-                                    {% if status == 'APPROVED' and application.approved_at %}
-                                        <div class="text-muted">{{ application.approved_at|date:"M j, Y H:i" }}</div>
-                                    {% endif %}
-                                </div>
-                            </li>
-                        {% endwith %}
-                    {% endwith %}
+                    <li class="d-flex align-items-start mb-3">
+                        <span class="me-3">
+                            {% if application.status == 'REJECTED' and status == 'APPROVED' %}
+                                <i class="bi bi-x-circle-fill text-danger fs-5"></i>
+                            {% elif application.status == status %}
+                                <i class="bi bi-record-circle-fill text-primary fs-5"></i>
+                            {% else %}
+                                <i class="bi bi-circle text-muted fs-5"></i>
+                            {% endif %}
+                        </span>
+                        <div>
+                            <div class="fw-semibold {% if application.status == status %}text-primary{% endif %}">
+                                {{ label }}
+                            </div>
+                            {% if status == 'SUBMITTED' and application.submitted_at %}
+                                <div class="text-muted">{{ application.submitted_at|date:"M j, Y H:i" }}</div>
+                            {% endif %}
+                            {% if status == 'APPROVED' and application.approved_at %}
+                                <div class="text-muted">{{ application.approved_at|date:"M j, Y H:i" }}</div>
+                            {% endif %}
+                        </div>
+                    </li>
                 {% endfor %}
             </ol>
 
@@ -111,4 +106,5 @@
             {% endif %}
         </div>
     </div>
-</div
+</div>
+{% endblock %}

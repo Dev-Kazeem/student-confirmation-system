@@ -25,7 +25,7 @@
                 </li>
             </ul>
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'admissions:check_admission' %}">Check Admission</a>
+                <a class="nav-link text-light" href="{% url 'admissions:check_admission' %}">Verify your informations</a>
             </li>
 
             <ul class="navbar-nav ms-auto">
@@ -62,16 +62,11 @@
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <a class="dropdown-item" href="/admin/">
-                                        <i class="bi bi-gear me-1"></i> Django admin
+                                        <i class="bi bi-gear me-1"></i>System Administration 
                                     </a>
                                 </li>
                             
                                 <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'reports:admin_dashboard' %}">
-                                        <i class="bi bi-speedometer2 me-1"></i> Admin dashboard
-                                    </a>
-                                </li>
                                 <li>
                                     <a class="dropdown-item" href="{% url 'reports:index' %}">
                                         <i class="bi bi-file-earmark-bar-graph me-1"></i> Reports
@@ -110,4 +105,4 @@
             </ul>
         </div>
     </div>
-</nav>
+</nav> 

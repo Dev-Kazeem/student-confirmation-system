@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Document Verification — {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h4 fw-bold mb-0">Document Verification</h1>
+        <a href="{% url 'reports:export_documents' %}?{{ request.GET.urlencode }}" class="btn btn-sm btn-primary">
+            <i class="bi bi-filetype-csv me-1"></i> Export CSV
+        </a>
+    </div>
+
+    {% include "partials/_admin_nav.html" %}
+
+    <form method="get" class="card border-0 shadow-sm mb-3">
+        <div class="card-body">
+            <div class="row g-2">
+                <div class="col-md-3">
+                    <select name="status" class="form-select form-select-sm">
+                        <option value="">All statuses</option>
+                        <option value="PENDING" {% if request.GET.status == "PENDING" %}selected{% endif %}>Pending</option>
+                        <option value="ACCEPTED" {% if request.GET.status == "ACCEPTED" %}selected{% endif %}>Accepted</option>
+                        <option value="REJECTED" {% if request.GET.status == "REJECTED" %}selected{% endif %}>Rejected</option>
+                        <option value="CORRECTION_REQUIRED" {% if request.GET.status == "CORRECTION_REQUIRED" %}selected{% endif %}>Correction Required</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-grid">
+                    <button class="btn btn-sm btn-primary">Filter</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0 small align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Application</th>
+                        <th>Student</th>
+                        <th>Document</th>
+                        <th>Status</th>
+                        <th>Uploaded</th>
+                        <th>Reviewed by</th>
+                        <th>Reviewed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in documents %}
+                        <tr>
+                            <td><code>{{ d.application.reference|slice:":8" }}…</code></td>
+                            <td>{{ d.application.student.get_full_name|default:d.application.student.username }}</td>
+                            <td>{{ d.document_type.name }}</td>
+                            <td>
+                                <span class="badge
+                                    {% if d.status == 'ACCEPTED' %}bg-success
+                                    {% elif d.status == 'REJECTED' %}bg-danger
+                                    {% elif d.status == 'CORRECTION_REQUIRED' %}bg-warning text-dark
+                                    {% else %}bg-secondary{% endif %}">
+                                    {{ d.get_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ d.uploaded_at|date:"M j, Y" }}</td>
+                            <td>
+                                {% if d.reviewed_by %}
+                                    {{ d.reviewed_by.get_full_name|default:d.reviewed_by.username }}
+                                {% else %}—{% endif %}
+                            </td>
+                            <td>{{ d.reviewed_at|date:"M j, Y"|default:"—" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-3">
+                                No documents match your filters.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer small text-muted">
+            Showing first 500 of {{ total }}. Export CSV for the full set.
+        </div>
+    </div>
+</div>
+{% endblock %}

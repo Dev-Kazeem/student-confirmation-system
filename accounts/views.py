@@ -126,13 +126,13 @@ def officer_dashboard(request):
     # Redirect to the real officer dashboard
     return redirect("applications:officer_dashboard")
 
-
 @login_required
 def admin_dashboard(request):
+    """Redirect to the full admin dashboard in the reports app."""
     if not (request.user.is_admin_role or request.user.is_superuser):
         messages.warning(request, "You are not authorized to view the admin dashboard.")
         return redirect("accounts:redirect_after_login")
-    return render(request, "accounts/admin_dashboard.html")
+    return redirect("reports:admin_dashboard")
 
 
 # ---------------------------------------------------------------------------
